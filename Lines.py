@@ -1,6 +1,7 @@
 import time
 from tkinter import *
 from random import *
+from tkinter import messagebox
 
 
 class Lines:
@@ -74,6 +75,9 @@ class Lines:
             self.cells_list[pos] = self.random_color()
             self.check(pos)
         self.update()
+        free = self.free_list()
+        if free.__len__() == 0:
+            messagebox.showinfo("PyLines", "You got " + str(self.coins) + " coins")
 
     def is_valid(self, x, y):
         return (x >= 0) and (y >= 0) and (x < self.lines_count) and (y < self.lines_count)
