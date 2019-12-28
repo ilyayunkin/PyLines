@@ -9,7 +9,7 @@ class Lines:
 
     def __init__(self):
         self.root = Tk()
-        self.lines_count = 14
+        self.lines_count = 9
         self.cells_count = self.lines_count * self.lines_count
         self.cells_list = list()
         self.pointed = False
@@ -58,7 +58,7 @@ class Lines:
 
     @staticmethod
     def random_color():
-        return choice(['blue', 'green','pink', 'red', 'yellow', 'magenta', 'cyan'])
+        return choice(['blue', 'green','black', 'red', 'yellow', 'magenta', 'cyan'])
 
     def free_list(self):
         free = list()
