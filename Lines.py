@@ -9,11 +9,19 @@ class Lines:
         self.root.mainloop()
 
     def __init__(self):
-        self.root = Tk()
         self.lines_count = 9
         self.cells_count = self.lines_count * self.lines_count
+
+        self.root = Tk()
+        self.cell_width = 30
+        self.size = self.lines_count * self.cell_width
+        self.canvas = Canvas(self.root, width=self.size, height=self.size)
+        self.canvas.pack()
+        self.canvas.bind('<Button-1>', self.action)
+        self.clear()
+
+    def clear(self):
         self.cells_list = list()
-        self.pointed = False
         self.selected = False
         self.selected_pos = 0
         self.coins = 0
@@ -21,12 +29,6 @@ class Lines:
         for i in range(self.cells_count):
             self.cells_list.append('')
 
-        self.cell_width = 30
-        self.size = self.lines_count * self.cell_width
-        self.canvas = Canvas(self.root, width=self.size, height=self.size)
-        self.canvas.pack()
-
-        self.canvas.bind('<Button-1>', self.action)
         self.step()
         self.update()
 
@@ -77,7 +79,8 @@ class Lines:
         self.update()
         free = self.free_list()
         if free.__len__() == 0:
-            messagebox.showinfo("PyLines", "You got " + str(self.coins) + " coins")
+            if messagebox.askquestion("PyLines", "You got " + str(self.coins) + " coins\nDo you want to restart?") == 'yes':
+                self.clear()
 
     def is_valid(self, x, y):
         return (x >= 0) and (y >= 0) and (x < self.lines_count) and (y < self.lines_count)
