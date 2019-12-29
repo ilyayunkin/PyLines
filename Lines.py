@@ -72,8 +72,10 @@ class Lines:
 
     def step(self):
         free = self.free_list()
-        for i in range(min(free.__len__(), 3)):
+        new_balls_count = range(min(free.__len__(), 3))
+        for i in new_balls_count:
             pos = choice(free)
+            free.remove(pos)
             self.cells_list[pos] = self.random_color()
             self.check(pos)
         self.update()
