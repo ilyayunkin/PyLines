@@ -9,10 +9,12 @@ class Lines:
         self.root.mainloop()
 
     def __init__(self):
+        self.game_name = "PyLines"
         self.lines_count = 9
         self.cells_count = self.lines_count * self.lines_count
 
         self.root = Tk()
+        self.root.title(self.game_name)
         self.cell_width = 30
         self.size = self.lines_count * self.cell_width
         self.canvas = Canvas(self.root, width=self.size, height=self.size)
@@ -81,7 +83,7 @@ class Lines:
         self.update()
         free = self.free_list()
         if free.__len__() == 0:
-            if messagebox.askquestion("PyLines", "You got " + str(self.coins) + " coins\nDo you want to restart?") == 'yes':
+            if messagebox.askquestion(self.game_name, "You got " + str(self.coins) + " coins\nDo you want to restart?") == 'yes':
                 self.clear()
 
     def is_valid(self, x, y):
