@@ -27,6 +27,7 @@ class Lines:
         self.selected = False
         self.selected_pos = 0
         self.coins = 0
+        self.combo = 1
 
         for i in range(self.cells_count):
             self.cells_list.append('')
@@ -176,10 +177,13 @@ class Lines:
         if r4.__len__() >= 5:
             del_list+=r4
         if del_list.__len__() >= 5:
-            self.coins += del_list.__len__()
+            self.coins += del_list.__len__() * self.combo
+            self.combo += 1
             print("coins="+str(self.coins))
             for i in del_list:
                 self.cells_list[i] = ''
+        else:
+            self.combo = 1
         print(str(del_list) + '=' + str(r1) + ' ' + str(r2) + ' ' + str(r3) + ' ' + str(r4))
 
         return del_list.__len__() >= 5
