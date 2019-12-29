@@ -39,6 +39,7 @@ class Lines:
         return pos
 
     def update(self):
+        self.root.title(self.game_name + " - " + str(self.coins) + " coins")
         self.canvas.delete("all")
         if self.selected:
             x = int(self.selected_pos % self.lines_count)
