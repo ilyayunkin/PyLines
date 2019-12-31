@@ -1,7 +1,8 @@
-import time
-from tkinter import *
 from random import *
+from tkinter import *
 from tkinter import messagebox
+from tkinter.simpledialog import askstring
+from Database import  Database
 
 
 class Lines:
@@ -9,9 +10,11 @@ class Lines:
         self.root.mainloop()
 
     def __init__(self):
+        self.db = Database()
+
         self.game_name = "PyLines"
         self.lines_count = 9
-        self.cells_count = self.lines_count * self.lines_count
+        self.cells_count = self.lines_count ** 2
 
         self.root = Tk()
         self.root.title(self.game_name)
@@ -51,7 +54,7 @@ class Lines:
             self.canvas.create_rectangle(x0, y0, x0 + self.cell_width, y0 + self.cell_width, fill=colors)
 
         for i in range(self.cells_count):
-            if self.cells_list[i] != '' :
+            if self.cells_list[i] != '':
                 x = int(i % self.lines_count)
                 y = int(i / self.lines_count)
                 x0 = x * self.cell_width
@@ -65,7 +68,7 @@ class Lines:
 
     @staticmethod
     def random_color():
-        return choice(['blue', 'green','black', 'red', 'yellow', 'magenta', 'cyan'])
+        return choice(['blue', 'green', 'black', 'red', 'yellow', 'magenta', 'cyan'])
 
     def free_list(self):
         free = list()
@@ -85,7 +88,19 @@ class Lines:
         self.update()
         free = self.free_list()
         if free.__len__() == 0:
-            if messagebox.askquestion(self.game_name, "You got " + str(self.coins) + " coins\nDo you want to restart?") == 'yes':
+            scores_list = self.db.get_scores()
+            if self.db.score_is_high(scores_list, self.coins):
+                name = askstring('Name', 'What is your name?')
+                self.db.save_score(name, self.coins)
+                self.db.get_scores()
+                if scores_list.__len__() >= self.db.get_max_scores():
+                    minimal = self.db.get_minimal_score()
+                    self.db.delete_extra_scores()
+                    self.db.get_scores()
+                messagebox.showinfo(self.game_name, self.db.get_scores())
+
+            if messagebox.askquestion(self.game_name,
+                                      "You got " + str(self.coins) + " coins\nDo you want to restart?") == 'yes':
                 self.clear()
 
     def is_valid(self, x, y):
@@ -97,14 +112,16 @@ class Lines:
         x = int(pos % self.lines_count)
         y = int(pos / self.lines_count)
         current_x = x - 1
-        current_y = y -1
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        current_y = y - 1
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_x = current_x - 1
             current_y = current_y - 1
         current_x = x + 1
         current_y = y + 1
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_x = current_x + 1
             current_y = current_y + 1
@@ -117,13 +134,15 @@ class Lines:
         y = int(pos / self.lines_count)
         current_x = x - 1
         current_y = y + 1
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_x = current_x - 1
             current_y = current_y + 1
         current_x = x + 1
         current_y = y - 1
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_x = current_x + 1
             current_y = current_y - 1
@@ -136,11 +155,13 @@ class Lines:
         y = int(pos / self.lines_count)
         current_y = y
         current_x = x - 1
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_x = current_x - 1
         current_x = x + 1
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_x = current_x + 1
         return del_list
@@ -152,12 +173,14 @@ class Lines:
         y = int(pos / self.lines_count)
         current_y = y - 1
         current_x = x
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_y = current_y - 1
         current_y = y + 1
         current_x = x
-        while self.is_valid(current_x, current_y) and (self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
+        while self.is_valid(current_x, current_y) and (
+                self.cells_list[self.coord_to_pos(current_x, current_y)] == self.cells_list[pos]):
             del_list.append(self.coord_to_pos(current_x, current_y))
             current_y = current_y + 1
         return del_list
@@ -169,17 +192,17 @@ class Lines:
         r3 = self.check_d1(pos)
         r4 = self.check_d2(pos)
         if r1.__len__() >= 5:
-            del_list+=r1
+            del_list += r1
         if r2.__len__() >= 5:
-            del_list+=r2
+            del_list += r2
         if r3.__len__() >= 5:
-            del_list+=r3
+            del_list += r3
         if r4.__len__() >= 5:
-            del_list+=r4
+            del_list += r4
         if del_list.__len__() >= 5:
             self.coins += del_list.__len__() * self.combo
             self.combo += 1
-            print("coins="+str(self.coins))
+            print("coins=" + str(self.coins))
             for i in del_list:
                 self.cells_list[i] = ''
         else:
@@ -191,14 +214,10 @@ class Lines:
     def is_nei(self, x, y, pos_to):
         ret = False
         if self.is_valid(x, y):
-            if(self.coord_to_pos(x + 1, y) == pos_to) or \
-                    (self.coord_to_pos(x + 1, y + 1) == pos_to) or \
-                    (self.coord_to_pos(x + 1, y - 1) == pos_to) or \
+            if (self.coord_to_pos(x + 1, y) == pos_to) or \
                     (self.coord_to_pos(x, y + 1) == pos_to) or \
                     (self.coord_to_pos(x, y - 1) == pos_to) or \
-                    (self.coord_to_pos(x - 1, y) == pos_to) or \
-                    (self.coord_to_pos(x - 1, y + 1) == pos_to) or \
-                    (self.coord_to_pos(x - 1, y - 1) == pos_to) :
+                    (self.coord_to_pos(x - 1, y) == pos_to):
                 ret = True
 
         return ret
